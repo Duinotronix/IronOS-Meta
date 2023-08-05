@@ -1,0 +1,28 @@
+diff a/img2logo.py b/img2logo.py
+index cdcaea3..083c253 100755
+--- a/img2logo.py
++++ b/img2logo.py
+@@ -232,6 +232,7 @@ def img2hex(
+             data.extend(get_screen_blob([0] * LCD_NUM_BYTES, image_bytes))
+
+     # Pad up to the full page size
++    size_without_padding = len(data)
+     if len(data) < LCD_PAGE_SIZE:
+         pad = [0] * (LCD_PAGE_SIZE - len(data))
+         data.extend(pad)
+@@ -249,6 +250,15 @@ def img2hex(
+         split_name = [base,ext]
+     output_name = output_filename_base +split_name[0] +split_name[1]
+
++    # Write raw binary data to bin file
++    fh = open(output_name + ".bin", 'wb')
++    bs = rb""
++    for byte in data:
++        bs += byte.to_bytes(1, 'big')
++    fh.write(bs[:size_without_padding])
++    fh.close()
++
++    # Write DFU file
+     DFUOutput.writeFile(
+         output_name + ".dfu",
+         data,
